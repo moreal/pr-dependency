@@ -7,6 +7,8 @@ from os import environ
 from app.services.config import ConfigService, EnvironmentConfigServiceBackend
 from typing import Callable, Dict, List, NewType
 
+from .handlers import ping, pull_request
+
 __all__ = (
     "GitHubEventHandler",
     "webhook",
@@ -46,7 +48,10 @@ def webhook(request: Request = request) -> Response:
     event: str = request.headers["X-GitHub-Event"]
     data: dict = request.get_json()
 
-    handlers: Dict[str, GitHubEventHandler] = {}
+    handlers: Dict[str, GitHubEventHandler] = {
+        "ping": ping,
+        "pull_request": pull_request,
+    }
     ignore: GitHubEventHandler = lambda x: Response("", 200)
     handler: GitHubEventHandler = handlers.get(event, ignore)
 
